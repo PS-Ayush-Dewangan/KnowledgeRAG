@@ -3,9 +3,9 @@ def build_prompt(context, question):
     return f"""
 You are an expert AI assistant.
 
-Answer the user's question using ONLY the information provided in the context.
+Answer the user's question using the provided context.
 
-Do not answer unrelated information.
+Focus on the most relevant information.
 
 Context:
 {context}
@@ -13,5 +13,5 @@ Context:
 Question:
 {question}
 
-Provide a direct answer to the question.
+Answer:
 """

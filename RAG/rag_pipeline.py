@@ -15,19 +15,13 @@ def ask_rag(question):
     for i, doc in enumerate(documents)
 )
 
-    print("\n===== RETRIEVED CONTEXT =====")
-    print(context)
-    print("=============================\n")
-
+   
     prompt = build_prompt(
         context=context,
         question=question
     )
 
-    print("\n===== FINAL PROMPT =====")
-    print(prompt)
-    print("========================\n")
-
+  
     llm = get_llm()
 
     response = llm.invoke(prompt)
