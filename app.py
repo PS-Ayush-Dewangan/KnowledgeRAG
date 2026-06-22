@@ -2,6 +2,7 @@ import streamlit as st
 
 from Sources.wikipedia_loader import load_wikipedia
 from Sources.website_loader import load_website
+from Sources.pdf_loader import load_pdf
 
 from Chunking.chunk_utils import create_chunks
 from VectorDB.vector_store import create_vector_store
@@ -18,7 +19,7 @@ st.set_page_config(
 st.title("🤖 KnowledgeRAG")
 
 st.markdown(
-    "Build a knowledge base from Wikipedia or Websites and ask questions."
+    "Build a knowledge base from Wikipedia, Websites, or PDFs and ask questions."
 )
 
 # ----------------------------------
@@ -27,7 +28,7 @@ st.markdown(
 
 source_type = st.radio(
     "Select Source",
-    ["Wikipedia", "Website"]
+    ["Wikipedia", "Website", "PDF"]
 )
 
 if source_type == "Wikipedia":
@@ -36,10 +37,17 @@ if source_type == "Wikipedia":
         "Enter Wikipedia Topic"
     )
 
-else:
+elif source_type == "Website":
 
     url = st.text_input(
         "Enter Website URL"
+    )
+
+else:
+
+    uploaded_file = st.file_uploader(
+        "Upload PDF",
+        type=["pdf"]
     )
 
 # ----------------------------------
@@ -56,9 +64,11 @@ if load_button:
 
         with st.spinner("Loading Knowledge Base..."):
 
+            # Wikipedia
             if source_type == "Wikipedia":
 
                 if not topic:
+
                     st.warning(
                         "Please enter a Wikipedia topic."
                     )
@@ -72,16 +82,18 @@ if load_button:
                     create_vector_store(chunks)
 
                     st.success(
-                        f"Knowledge loaded successfully from Wikipedia topic: {topic}"
+                        f"Knowledge loaded successfully from Wikipedia: {topic}"
                     )
 
                     st.info(
                         f"Chunks Created: {len(chunks)}"
                     )
 
-            else:
+            # Website
+            elif source_type == "Website":
 
                 if not url:
+
                     st.warning(
                         "Please enter a Website URL."
                     )
@@ -102,6 +114,48 @@ if load_button:
                         f"Chunks Created: {len(chunks)}"
                     )
 
+            # PDF
+            else:
+
+                if uploaded_file is None:
+
+                    st.warning(
+                        "Please upload a PDF."
+                    )
+
+                else:
+
+                    temp_pdf_path = "temp_uploaded.pdf"
+
+                    with open(
+                        temp_pdf_path,
+                        "wb"
+                    ) as file:
+
+                        file.write(
+                            uploaded_file.getbuffer()
+                        )
+
+                    text = load_pdf(
+                        temp_pdf_path
+                    )
+
+                    chunks = create_chunks(
+                        text
+                    )
+
+                    create_vector_store(
+                        chunks
+                    )
+
+                    st.success(
+                        "PDF loaded successfully!"
+                    )
+
+                    st.info(
+                        f"Chunks Created: {len(chunks)}"
+                    )
+
     except Exception as error:
 
         st.error(
@@ -109,7 +163,7 @@ if load_button:
         )
 
 # ----------------------------------
-# Ask Question Section
+# Ask Question
 # ----------------------------------
 
 st.divider()
