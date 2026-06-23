@@ -7,7 +7,7 @@ from Sources.pdf_loader import load_pdf
 from Chunking.chunk_utils import create_chunks
 from VectorDB.vector_store import create_vector_store
 
-from RAG.rag_pipeline import ask_rag
+from RAG.rag_pipeline import ask_rag, ask_wikipedia
 
 
 st.set_page_config(
@@ -175,17 +175,20 @@ with st.sidebar:
 
     st.markdown('<div class="sidebar-section">Configure Source</div>', unsafe_allow_html=True)
 
-    topic = url = uploaded_file = None
+    url = uploaded_file = None
 
     if source_type == "Wikipedia":
-        topic = st.text_input("Wikipedia Topic", placeholder="e.g. Artificial Intelligence")
+        st.info("💡 Just ask any question — Wikipedia will be searched automatically.")
     elif source_type == "Website":
         url = st.text_input("Website URL", placeholder="https://example.com")
     else:
         uploaded_file = st.file_uploader("Upload PDF", type=["pdf"])
 
-    st.markdown("---")
-    load_button = st.button("⚡ Load Knowledge Base")
+    if source_type != "Wikipedia":
+        st.markdown("---")
+        load_button = st.button("⚡ Load Knowledge Base")
+    else:
+        load_button = False
 
     st.markdown("---")
     st.markdown('<div class="sidebar-section">About</div>', unsafe_allow_html=True)
@@ -196,62 +199,52 @@ with st.sidebar:
 # ----------------------------------
 col1, col2 = st.columns([1, 1], gap="large")
 
-with col1:
-    st.markdown('<div class="card"><div class="card-title">📦 Knowledge Base Status</div>', unsafe_allow_html=True)
+if source_type != "Wikipedia":
+    with col1:
+        st.markdown('<div class="card"><div class="card-title">📦 Knowledge Base Status</div>', unsafe_allow_html=True)
 
-    if load_button:
-        try:
-            with st.spinner("Loading & indexing your knowledge source..."):
-                if source_type == "Wikipedia":
-                    if not topic:
-                        st.warning("Please enter a Wikipedia topic.")
+        if load_button:
+            try:
+                with st.spinner("Loading & indexing your knowledge source..."):
+                    if source_type == "Website":
+                        if not url:
+                            st.warning("Please enter a Website URL.")
+                        else:
+                            text = load_website(url)
+                            chunks = create_chunks(text)
+                            create_vector_store(chunks)
+                            st.session_state["kb_loaded"] = True
+                            st.session_state["kb_info"] = f"Website · {url} · {len(chunks)} chunks"
+                            st.success("✅ Website content loaded successfully.")
+                            st.markdown(f'<div class="stat-badge">📌 {len(chunks)} chunks indexed</div>', unsafe_allow_html=True)
+
                     else:
-                        text = load_wikipedia(topic)
-                        chunks = create_chunks(text)
-                        create_vector_store(chunks)
-                        st.session_state["kb_loaded"] = True
-                        st.session_state["kb_info"] = f"Wikipedia · **{topic}** · {len(chunks)} chunks"
-                        st.success(f"✅ Wikipedia article loaded: **{topic}**")
-                        st.markdown(f'<div class="stat-badge">📌 {len(chunks)} chunks indexed</div>', unsafe_allow_html=True)
+                        if uploaded_file is None:
+                            st.warning("Please upload a PDF file.")
+                        else:
+                            temp_pdf_path = "temp_uploaded.pdf"
+                            with open(temp_pdf_path, "wb") as f:
+                                f.write(uploaded_file.getbuffer())
+                            text = load_pdf(temp_pdf_path)
+                            chunks = create_chunks(text)
+                            create_vector_store(chunks)
+                            st.session_state["kb_loaded"] = True
+                            st.session_state["kb_info"] = f"PDF · **{uploaded_file.name}** · {len(chunks)} chunks"
+                            st.success(f"✅ PDF loaded: **{uploaded_file.name}**")
+                            st.markdown(f'<div class="stat-badge">📌 {len(chunks)} chunks indexed</div>', unsafe_allow_html=True)
 
-                elif source_type == "Website":
-                    if not url:
-                        st.warning("Please enter a Website URL.")
-                    else:
-                        text = load_website(url)
-                        chunks = create_chunks(text)
-                        create_vector_store(chunks)
-                        st.session_state["kb_loaded"] = True
-                        st.session_state["kb_info"] = f"Website · {url} · {len(chunks)} chunks"
-                        st.success("✅ Website content loaded successfully.")
-                        st.markdown(f'<div class="stat-badge">📌 {len(chunks)} chunks indexed</div>', unsafe_allow_html=True)
+            except Exception as error:
+                st.error(f"❌ {error}")
 
-                else:
-                    if uploaded_file is None:
-                        st.warning("Please upload a PDF file.")
-                    else:
-                        temp_pdf_path = "temp_uploaded.pdf"
-                        with open(temp_pdf_path, "wb") as f:
-                            f.write(uploaded_file.getbuffer())
-                        text = load_pdf(temp_pdf_path)
-                        chunks = create_chunks(text)
-                        create_vector_store(chunks)
-                        st.session_state["kb_loaded"] = True
-                        st.session_state["kb_info"] = f"PDF · **{uploaded_file.name}** · {len(chunks)} chunks"
-                        st.success(f"✅ PDF loaded: **{uploaded_file.name}**")
-                        st.markdown(f'<div class="stat-badge">📌 {len(chunks)} chunks indexed</div>', unsafe_allow_html=True)
+        elif st.session_state.get("kb_loaded"):
+            st.info(f"🗂️ Active: {st.session_state.get('kb_info', 'Knowledge base ready')}")
+        else:
+            st.markdown('<p style="color:#64748b; font-size:0.95rem;">No knowledge base loaded yet. Select a source and click <b>Load Knowledge Base</b>.</p>', unsafe_allow_html=True)
 
-        except Exception as error:
-            st.error(f"❌ {error}")
+        st.markdown('</div>', unsafe_allow_html=True)
 
-    elif st.session_state.get("kb_loaded"):
-        st.info(f"🗂️ Active: {st.session_state.get('kb_info', 'Knowledge base ready')}")
-    else:
-        st.markdown('<p style="color:#64748b; font-size:0.95rem;">No knowledge base loaded yet. Select a source and click <b>Load Knowledge Base</b>.</p>', unsafe_allow_html=True)
-
-    st.markdown('</div>', unsafe_allow_html=True)
-
-with col2:
+ask_col = col2 if source_type != "Wikipedia" else st.container()
+with ask_col:
     st.markdown('<div class="card"><div class="card-title">💬 Ask a Question</div>', unsafe_allow_html=True)
 
     question = st.text_input("", placeholder="What would you like to know?", label_visibility="collapsed")
@@ -262,6 +255,13 @@ with col2:
 if ask_button:
     if not question:
         st.warning("Please enter a question.")
+    elif source_type == "Wikipedia":
+        try:
+            with st.spinner("Searching Wikipedia & generating answer..."):
+                answer = ask_wikipedia(question)
+            st.markdown(f'<div class="answer-box">{answer}</div>', unsafe_allow_html=True)
+        except Exception as error:
+            st.error(f"❌ {error}")
     elif not st.session_state.get("kb_loaded"):
         st.warning("Load a knowledge base first.")
     else:

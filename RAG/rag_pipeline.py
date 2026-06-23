@@ -3,6 +3,16 @@ from opentelemetry import context
 from Retrieval.retriever import retrieve_documents
 from LLM.llm_utils import get_llm
 from RAG.prompt_builder import build_prompt
+from Sources.wikipedia_loader import load_wikipedia
+from Chunking.chunk_utils import create_chunks
+from VectorDB.vector_store import create_vector_store
+
+
+def ask_wikipedia(question):
+    text = load_wikipedia(question)
+    chunks = create_chunks(text)
+    create_vector_store(chunks)
+    return ask_rag(question)
 
 
 def ask_rag(question):

@@ -1,8 +1,7 @@
 from Sources.wikipedia_loader import load_wikipedia
 
 text = load_wikipedia(
-    "Artificial intelligence"
+    "Ray Ban"
 )
 
-if text:
-    print(text[:2000])
+print(text[:2000])
