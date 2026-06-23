@@ -1,91 +1,205 @@
 # KnowledgeRAG
 
-An end-to-end Retrieval-Augmented Generation (RAG) application that enables users to create custom knowledge bases from Wikipedia articles, websites, and PDF documents, and interact with them using natural language queries powered by Large Language Models.
+KnowledgeRAG is an end-to-end Retrieval-Augmented Generation (RAG) application that enables users to query information from Wikipedia, websites, and PDF documents using Large Language Models (LLMs).
+
+The system retrieves relevant information from external knowledge sources, augments the prompt with the retrieved context, and generates accurate, context-aware responses using Llama 3.2.
 
 ---
 
 # Overview
 
-KnowledgeRAG combines modern AI technologies including Large Language Models (LLMs), embeddings, vector databases, and semantic retrieval to provide accurate and context-aware answers from user-provided knowledge sources.
+KnowledgeRAG combines semantic search, vector embeddings, and Retrieval-Augmented Generation (RAG) to answer user queries using custom knowledge sources.
 
-The application allows users to:
+The application supports:
 
-* Load knowledge from Wikipedia
-* Scrape and process website content
-* Upload and analyze PDF documents
-* Generate vector embeddings
-* Store embeddings in a FAISS vector database
-* Retrieve relevant context using semantic search
-* Generate answers using Llama 3.2
-* Interact through a Streamlit-based web interface
+* Dynamic Wikipedia Search
+* Website Content Scraping
+* PDF Document Processing
+* Semantic Search using FAISS
+* Context-Aware Question Answering
+* Interactive Streamlit User Interface
 
 ---
 
 # Features
 
-## Knowledge Source Integration
+## Wikipedia Search
 
-* Wikipedia Article Ingestion
-* Website Content Scraping
-* PDF Document Processing
+* Ask questions directly without manually loading articles.
+* Automatically searches Wikipedia.
+* Retrieves the most relevant article.
+* Generates answers using retrieved knowledge.
 
-## Retrieval-Augmented Generation (RAG)
+## Website Knowledge Base
 
-* Semantic Text Chunking
-* Vector Embedding Generation
-* FAISS Vector Database Storage
-* Similarity-Based Document Retrieval
-* Context-Aware Answer Generation
+* Extracts content from websites.
+* Creates embeddings and stores them in FAISS.
+* Answers questions based on website content.
 
-## AI Capabilities
+## PDF Knowledge Base
 
-* Llama 3.2 Integration via Ollama
-* MXBAI Embed Large Embeddings
-* Semantic Search
-* Question Answering over Custom Knowledge Bases
+* Upload PDF documents directly from the UI.
+* Extracts and processes document content.
+* Supports question answering over uploaded documents.
 
-## Interactive Web Interface
+## Retrieval-Augmented Generation
 
-* Streamlit Dashboard
-* Wikipedia Topic Selection
-* Website URL Input
-* PDF Upload Support
-* Interactive Question Answering
+* Semantic Chunking
+* Embedding Generation
+* Vector Similarity Search
+* Context Retrieval
+* LLM-Based Answer Generation
+
+## User Interface
+
+* Built using Streamlit
+* Dynamic source selection
+* PDF upload support
+* Interactive question-answering workflow
 
 ---
 
 # Architecture
 
+## Wikipedia Workflow
+
 ```text
-Wikipedia / Website / PDF
-            │
-            ▼
-      Data Loaders
-            │
-            ▼
-     Text Extraction
-            │
-            ▼
-        Chunking
-            │
-            ▼
-   Embedding Generation
-            │
-            ▼
-      FAISS Vector DB
-            │
-            ▼
-        Retriever
-            │
-            ▼
-        Llama 3.2
-            │
-            ▼
-     Answer Generation
-            │
-            ▼
-       Streamlit UI
+User Question
+      │
+      ▼
+Wikipedia Search
+      │
+      ▼
+Best Matching Article
+      │
+      ▼
+Article Content
+      │
+      ▼
+Llama 3.2
+      │
+      ▼
+Generated Answer
 ```
+
+## Website / PDF Workflow
+
+```text
+Website / PDF
+      │
+      ▼
+Text Extraction
+      │
+      ▼
+Chunking
+      │
+      ▼
+Embedding Generation
+      │
+      ▼
+FAISS Vector Database
+      │
+      ▼
+Retriever
+      │
+      ▼
+Relevant Context
+      │
+      ▼
+Prompt Builder
+      │
+      ▼
+Llama 3.2
+      │
+      ▼
+Generated Answer
+```
+
+## Complete System Architecture
+
+```text
+                    ┌─────────────────┐
+                    │ User Question   │
+                    └────────┬────────┘
+                             │
+               ┌─────────────┼─────────────┐
+               │             │             │
+               ▼             ▼             ▼
+        Wikipedia       Website         PDF
+          Search        Loader         Loader
+               │             │             │
+               │             ▼             ▼
+               │      Text Extraction  Text Extraction
+               │             │             │
+               │             ▼             ▼
+               │          Chunking     Chunking
+               │             │             │
+               │             ▼             ▼
+               │        Embeddings    Embeddings
+               │             │             │
+               │             ▼             ▼
+               │          FAISS DB     FAISS DB
+               │             │             │
+               │             ▼             ▼
+               │          Retriever   Retriever
+               │             │             │
+               └───────┬─────┴─────┬───────┘
+                       │           │
+                       ▼           ▼
+                   Context Retrieval
+                           │
+                           ▼
+                    Prompt Builder
+                           │
+                           ▼
+                       Llama 3.2
+                           │
+                           ▼
+                    Generated Answer
+```
+
+---
+
+# Tech Stack
+
+## Programming Language
+
+* Python 3.14
+
+## Large Language Model
+
+* Llama 3.2
+
+## Embedding Model
+
+* mxbai-embed-large
+
+## Frameworks & Libraries
+
+* LangChain
+* Streamlit
+* Ollama
+* BeautifulSoup4
+* PyPDF
+* Wikipedia API
+
+## Vector Database
+
+* FAISS (Facebook AI Similarity Search)
+
+---
+
+# Core Concepts Used
+
+* Retrieval-Augmented Generation (RAG)
+* Semantic Search
+* Embeddings
+* Vector Databases
+* Similarity Search
+* Prompt Engineering
+* Document Chunking
+* Information Retrieval
+* Large Language Models
 
 ---
 
@@ -97,7 +211,6 @@ L1 RAG/
 ├── app.py
 ├── README.md
 ├── requirements.txt
-├── .gitignore
 │
 ├── config/
 │   └── config.py
@@ -106,8 +219,6 @@ L1 RAG/
 │   ├── sample.txt
 │   ├── topics.py
 │   └── pdfs/
-│
-├── Docs/
 │
 ├── LLM/
 │   ├── llm_utils.py
@@ -119,8 +230,7 @@ L1 RAG/
 │   └── embedding_test.py
 │
 ├── Chunking/
-│   ├── chunk_utils.py
-│   └── __init__.py
+│   └── chunk_utils.py
 │
 ├── Retrieval/
 │   └── retriever.py
@@ -135,217 +245,17 @@ L1 RAG/
 │   └── pdf_loader.py
 │
 ├── VectorDB/
-│   ├── vector_store.py
-│   ├── pdf_index/
-│   └── website_index/
-│
-├── faiss_index/
-│   ├── index.faiss
-│   └── index.pkl
+│   └── vector_store.py
 │
 ├── Tests/
-│   ├── chunking_test.py
-│   ├── vector_test.py
-│   ├── test_llm_context.py
-│   ├── test_retrieval.py
-│   ├── test_rag.py
-│   ├── test_multi_wikipedia.py
-│   ├── test_wikipedia_loader.py
-│   ├── test_wikipedia_query.py
-│   ├── test_wikipedia_rag.py
-│   ├── test_website_loader.py
-│   ├── test_website_rag.py
-│   ├── test_pdf_loader.py
-│   ├── test_pdf_rag.py
-│   └── test_pdf_query.py
 │
-└── venv/
-```
-
----
-
-# Tech Stack
-
-## Programming Language
-
-* Python 3.14
-
-## AI & LLM
-
-* Ollama
-* Llama 3.2
-
-## Embedding Model
-
-* MXBAI Embed Large
-
-## Frameworks & Libraries
-
-* LangChain
-* Streamlit
-* FAISS
-* BeautifulSoup4
-* Requests
-* PyPDF
-
-## Vector Database
-
-* FAISS (Facebook AI Similarity Search)
-
----
-
-# Installation
-
-## Clone Repository
-
-```bash
-git clone <repository-url>
-cd L1-RAG
-```
-
-## Create Virtual Environment
-
-```bash
-python -m venv venv
-```
-
-## Activate Virtual Environment
-
-### Windows
-
-```bash
-venv\Scripts\activate
-```
-
-### Linux / macOS
-
-```bash
-source venv/bin/activate
-```
-
-## Install Dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
----
-
-# Ollama Setup
-
-Install Ollama and pull required models:
-
-```bash
-ollama pull llama3.2
-ollama pull mxbai-embed-large
-```
-
-Verify models:
-
-```bash
-ollama list
-```
-
----
-
-# Run Application
-
-Start the Streamlit application:
-
-```bash
-streamlit run app.py
-```
-
----
-
-# Usage
-
-## Wikipedia Knowledge Base
-
-1. Select **Wikipedia**
-2. Enter a topic
-3. Click **Load Knowledge**
-4. Ask questions related to the topic
-
-### Example
-
-```text
-Topic:
-Artificial Intelligence
-
-Question:
-What is Machine Learning?
-```
-
----
-
-## Website Knowledge Base
-
-1. Select **Website**
-2. Enter a website URL
-3. Click **Load Knowledge**
-4. Ask questions based on website content
-
-### Example
-
-```text
-URL:
-https://fastapi.tiangolo.com/
-
-Question:
-What is FastAPI?
-```
-
----
-
-## PDF Knowledge Base
-
-1. Select **PDF**
-2. Upload a PDF document
-3. Click **Load Knowledge**
-4. Ask questions based on document content
-
-### Example
-
-```text
-PDF:
-Research Paper
-
-Question:
-What is Retrieval-Augmented Generation?
-```
-
----
-
-# Example Queries
-
-## Wikipedia
-
-```text
-What is Artificial Intelligence?
-What is Deep Learning?
-Explain Neural Networks.
-```
-
-## Website
-
-```text
-What is FastAPI?
-What are the features of FastAPI?
-How does dependency injection work?
-```
-
-## PDF
-
-```text
-What is Retrieval-Augmented Generation?
-Summarize the paper.
-What challenges do LLMs face?
+└── faiss_index/
 ```
 
 ---
 
 # Author
 
-**Ayush Raj Dewangan**
+Ayush Raj Dewangan
+
 
