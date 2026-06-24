@@ -1,16 +1,31 @@
 from Sources.pdf_loader import load_pdf
+
 from Chunking.chunk_utils import create_chunks
-from VectorDB.vector_store import create_vector_store
 
+from VectorDB.pinecone_store import (
+    create_pinecone_store
+)
 
-pdf_path = "data/pdfs/sample.pdf"
+pdf_path = "Data/pdfs/sample.pdf"
 
-text = load_pdf(pdf_path)
+text = load_pdf(
+    pdf_path
+)
 
-chunks = create_chunks(text)
+chunks = create_chunks(
+    text
+)
 
-print(f"Chunks Created: {len(chunks)}")
+print(
+    f"Chunks Created: {len(chunks)}"
+)
 
-create_vector_store(chunks)
+create_pinecone_store(
+    chunks,
+    source="PDF",
+    document=pdf_path
+)
 
-print("PDF stored in FAISS successfully")
+print(
+    "PDF stored in Pinecone successfully"
+)

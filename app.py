@@ -5,7 +5,7 @@ from Sources.website_loader import load_website
 from Sources.pdf_loader import load_pdf
 
 from Chunking.chunk_utils import create_chunks
-from VectorDB.vector_store import create_vector_store
+from VectorDB.pinecone_store import create_pinecone_store
 
 from RAG.rag_pipeline import ask_rag, ask_wikipedia
 
@@ -192,7 +192,7 @@ with st.sidebar:
 
     st.markdown("---")
     st.markdown('<div class="sidebar-section">About</div>', unsafe_allow_html=True)
-    st.caption("Powered by **Llama 3.2** · FAISS · LangChain · Streamlit")
+    st.caption("Powered by **Llama 3.2** · Pinecone · LangChain · Streamlit")
 
 # ----------------------------------
 # Main Area — Status + Q&A
@@ -212,7 +212,11 @@ if source_type != "Wikipedia":
                         else:
                             text = load_website(url)
                             chunks = create_chunks(text)
-                            create_vector_store(chunks)
+                            create_pinecone_store(
+                                chunks,
+                                source="Website",
+                                document=url
+                            )
                             st.session_state["kb_loaded"] = True
                             st.session_state["kb_info"] = f"Website · {url} · {len(chunks)} chunks"
                             st.success("✅ Website content loaded successfully.")
@@ -227,7 +231,11 @@ if source_type != "Wikipedia":
                                 f.write(uploaded_file.getbuffer())
                             text = load_pdf(temp_pdf_path)
                             chunks = create_chunks(text)
-                            create_vector_store(chunks)
+                            create_pinecone_store(
+                                chunks,
+                                source="PDF",
+                                document=uploaded_file.name
+                            )
                             st.session_state["kb_loaded"] = True
                             st.session_state["kb_info"] = f"PDF · **{uploaded_file.name}** · {len(chunks)} chunks"
                             st.success(f"✅ PDF loaded: **{uploaded_file.name}**")
@@ -267,7 +275,10 @@ if ask_button:
     else:
         try:
             with st.spinner("Thinking..."):
-                answer = ask_rag(question)
+                answer = ask_rag(
+                    question,
+                    source=source_type
+                )
             st.markdown(f'<div class="answer-box">{answer}</div>', unsafe_allow_html=True)
         except Exception as error:
             st.error(f"❌ {error}")

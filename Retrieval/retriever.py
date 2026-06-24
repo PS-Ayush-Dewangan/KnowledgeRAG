@@ -1,13 +1,16 @@
-from VectorDB.vector_store import load_vector_store
+from VectorDB.pinecone_store import (
+    retrieve_documents as retrieve_from_pinecone
+)
 
 
-def retrieve_documents(query, k=3):
+def retrieve_documents(
+    query,
+    source=None,
+    k=3
+):
 
-    vector_store = load_vector_store()
-
-    results = vector_store.similarity_search(
-        query,
+    return retrieve_from_pinecone(
+        query=query,
+        source=source,
         k=k
     )
-
-    return results

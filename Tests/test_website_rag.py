@@ -1,15 +1,31 @@
 from Sources.website_loader import load_website
+
 from Chunking.chunk_utils import create_chunks
-from VectorDB.vector_store import create_vector_store
+
+from VectorDB.pinecone_store import (
+    create_pinecone_store
+)
 
 url = "https://fastapi.tiangolo.com/"
 
-text = load_website(url)
+text = load_website(
+    url
+)
 
-chunks = create_chunks(text)
+chunks = create_chunks(
+    text
+)
 
-print(f"Chunks Created: {len(chunks)}")
+print(
+    f"Chunks Created: {len(chunks)}"
+)
 
-create_vector_store(chunks)
+create_pinecone_store(
+    chunks,
+    source="Website",
+    document=url
+)
 
-print("Website data stored in FAISS")
+print(
+    "Website data stored in Pinecone successfully"
+)

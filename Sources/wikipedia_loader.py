@@ -1,28 +1,35 @@
+import time
 import wikipedia
 
 
-def load_wikipedia(query):
+def load_wikipedia(query, retries=3, delay=2):
 
-    try:
+    wikipedia.set_user_agent("KnowledgeRAG/1.0 (research project)")
 
-        search_results = wikipedia.search(
-            query,
-            results=1
-        )
+    for attempt in range(retries):
 
-        if not search_results:
+        try:
 
-            return None
+            search_results = wikipedia.search(query, results=1)
 
-        page = wikipedia.page(
-            search_results[0],
-            auto_suggest=False
-        )
+            if not search_results:
+                raise ValueError(f"No Wikipedia article found for: '{query}'")
 
-        return page.content
+            page = wikipedia.page(search_results[0], auto_suggest=False)
 
-    except Exception as error:
+            return page.content
 
-        print(error)
+        except wikipedia.exceptions.DisambiguationError as e:
 
-        return None
+            page = wikipedia.page(e.options[0], auto_suggest=False)
+            return page.content
+
+        except ValueError:
+            raise
+
+        except Exception as error:
+
+            if attempt < retries - 1:
+                time.sleep(delay)
+            else:
+                raise ValueError(f"Wikipedia search failed after {retries} attempts: {error}")

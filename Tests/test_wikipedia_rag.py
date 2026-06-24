@@ -1,16 +1,31 @@
 from Sources.wikipedia_loader import load_wikipedia
+
 from Chunking.chunk_utils import create_chunks
-from VectorDB.vector_store import create_vector_store
 
+from VectorDB.pinecone_store import (
+    create_pinecone_store
+)
 
-topic = "Artificial intelligence"
+topic = "Artificial Intelligence"
 
-text = load_wikipedia(topic)
+text = load_wikipedia(
+    topic
+)
 
-chunks = create_chunks(text)
+chunks = create_chunks(
+    text
+)
 
-print(f"Total Chunks: {len(chunks)}")
+print(
+    f"Total Chunks: {len(chunks)}"
+)
 
-vector_store = create_vector_store(chunks)
+create_pinecone_store(
+    chunks,
+    source="Wikipedia",
+    document=topic
+)
 
-print("Wikipedia data stored in FAISS successfully")
+print(
+    "Wikipedia data stored in Pinecone successfully"
+)

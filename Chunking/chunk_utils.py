@@ -11,4 +11,7 @@ def create_chunks(
         chunk_overlap=chunk_overlap
     )
 
+    if not text:
+        raise ValueError("Cannot chunk empty or None text.")
+
     return splitter.split_text(text)
