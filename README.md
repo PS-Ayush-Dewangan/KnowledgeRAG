@@ -1,130 +1,106 @@
-# KnowledgeRAG
+# 🧠 KnowledgeRAG
 
-An End-to-End Retrieval-Augmented Generation (RAG) System that enables users to query information from Wikipedia, Websites, and PDF documents using Large Language Models (LLMs).
-
-KnowledgeRAG combines dynamic knowledge retrieval, semantic search, vector embeddings, and LLM-powered question answering to generate accurate and context-aware responses.
+> An End-to-End Retrieval-Augmented Generation (RAG) system that lets you query knowledge from Wikipedia, Websites, and PDF documents using Large Language Models — powered by Pinecone vector search and Llama 3.2.
 
 ---
 
-# Overview
+## 📌 Overview
 
-KnowledgeRAG allows users to interact with external knowledge sources through a unified interface.
+KnowledgeRAG is a production-ready RAG application that combines semantic search, vector embeddings, cloud-based vector storage, and LLM-powered question answering into a unified, interactive interface.
 
-The system supports:
+Users can ask questions against three knowledge sources:
 
-* Dynamic Wikipedia Search
-* Website Content Ingestion
-* PDF Document Processing
-* Semantic Search using Vector Embeddings
-* Retrieval-Augmented Generation (RAG)
-* Interactive Streamlit Interface
+- **Wikipedia** — ask any question and the system automatically searches and retrieves the most relevant article
+- **Websites** — extract and index content from any URL
+- **PDFs** — upload documents and query them instantly
 
-The project uses FAISS as a vector database, mxbai-embed-large for embeddings, and Llama 3.2 for answer generation.
+The system uses **Pinecone** as the cloud vector database, **mxbai-embed-large** for embeddings, and **Llama 3.2** (via Ollama) for answer generation.
 
 ---
 
-# Features
+## ✨ Features
 
-## Wikipedia Search
+| Feature | Description |
+|---|---|
+| 🔍 Dynamic Wikipedia Search | Ask any question — Wikipedia is searched automatically |
+| 🌐 Website Knowledge Base | Extract, embed, and query any website |
+| 📄 PDF Knowledge Base | Upload PDFs and ask questions against them |
+| 🗄️ Pinecone Vector Database | Cloud-hosted, persistent, scalable vector storage |
+| 🏷️ Metadata Storage | Every chunk stores source, document, and position metadata |
+| 🎯 Source-Based Filtering | Retrieval is filtered by source for precision |
+| 🧠 Prompt Engineering | Advanced prompt builder that prevents hallucinations |
+| 💬 Streamlit UI | Clean, interactive, market-ready web interface |
+| 🤖 LLM-powered Answers | Llama 3.2 generates context-aware, structured answers |
 
-* Ask questions directly without manually loading articles.
-* Automatically searches Wikipedia.
-* Retrieves the most relevant article.
-* Processes article content through the RAG pipeline.
-* Generates context-aware answers.
+---
 
-### Example
+## 🧪 Core AI Concepts
 
-```text
-Question:
-What is Ray Ban?
+**Retrieval-Augmented Generation (RAG)**
+Combines information retrieval with LLM generation. Instead of relying on the model's training data, relevant context is retrieved from a knowledge base and injected into the prompt.
+
+**Semantic Search**
+Searches by meaning rather than keywords. Queries and documents are converted to embeddings and compared by cosine similarity.
+
+**Embeddings**
+Dense vector representations of text. Semantically similar texts produce similar vectors, enabling meaning-based search.
+
+**Chunking**
+Long documents are split into smaller overlapping segments so each chunk fits within the embedding model's context window and carries focused information.
+
+**Vector Databases**
+Specialized databases optimized for storing and searching high-dimensional vectors at scale using approximate nearest neighbor (ANN) search.
+
+**Pinecone**
+A cloud-native, serverless vector database. Provides persistent storage, metadata filtering, horizontal scalability, and fast similarity search — without managing infrastructure.
+
+**Metadata**
+Structured attributes attached to each vector. Enables filtering, source tracking, citations, and explainability.
+
+**Metadata Filtering**
+Narrows vector search to a specific subset (e.g., only PDF chunks) before similarity comparison, improving precision and reducing noise.
+
+**Prompt Engineering**
+Designing prompts that guide the LLM to produce accurate, structured, and hallucination-free responses using retrieved context.
+
+**Similarity Search**
+Finding the top-k vectors closest to a query vector using distance metrics like cosine similarity or dot product.
+
+**Large Language Models (LLMs)**
+Foundation models trained on large text corpora. Used here to synthesize retrieved context into coherent, human-readable answers.
+
+---
+
+## 🏗️ Architecture
+
+### Wikipedia Workflow
+
 ```
-
----
-
-## Website Knowledge Base
-
-* Extract content from websites.
-* Chunk and embed website data.
-* Store embeddings in FAISS.
-* Ask questions based on website content.
-
-### Example
-
-```text
-URL:
-https://fastapi.tiangolo.com/
-
-Question:
-What is FastAPI?
-```
-
----
-
-## PDF Knowledge Base
-
-* Upload PDF documents directly through the UI.
-* Extract text from PDFs.
-* Generate embeddings.
-* Store content in FAISS.
-* Query uploaded documents.
-
-### Example
-
-```text
-Question:
-What is Retrieval-Augmented Generation?
-```
-
----
-
-# Core Concepts Used
-
-This project implements several important AI and LLM engineering concepts:
-
-* Retrieval-Augmented Generation (RAG)
-* Semantic Search
-* Embeddings
-* Vector Databases
-* Similarity Search
-* Prompt Engineering
-* Document Chunking
-* Information Retrieval
-* Large Language Models
-* Dynamic Knowledge Retrieval
-
----
-
-# Architecture
-
-## Wikipedia Workflow
-
-```text
 User Question
       │
       ▼
-Wikipedia Search
+Wikipedia Auto-Search
       │
       ▼
-Best Matching Article
+Best Matching Article Selected
       │
       ▼
-Article Content
+Extract Article Text
       │
       ▼
 Chunking
       │
       ▼
-Embedding Generation
+Embedding Generation (mxbai-embed-large)
       │
       ▼
-FAISS Vector Database
+Pinecone (Store + Metadata)
       │
       ▼
-Retriever
+Metadata Filtering (source = "Wikipedia")
       │
       ▼
-Relevant Context
+Retriever — Top Relevant Chunks
       │
       ▼
 Prompt Builder
@@ -138,51 +114,13 @@ Generated Answer
 
 ---
 
-## Website Workflow
+### Website Workflow
 
-```text
+```
 Website URL
       │
       ▼
-Website Loader
-      │
-      ▼
-Extract Website Content
-      │
-      ▼
-Chunking
-      │
-      ▼
-Embedding Generation
-      │
-      ▼
-FAISS Vector Database
-      │
-      ▼
-Retriever
-      │
-      ▼
-Relevant Context
-      │
-      ▼
-Prompt Builder
-      │
-      ▼
-Llama 3.2
-      │
-      ▼
-Generated Answer
-```
-
----
-
-## PDF Workflow
-
-```text
-PDF Upload
-      │
-      ▼
-PDF Loader
+Website Loader (BeautifulSoup)
       │
       ▼
 Extract Text
@@ -194,13 +132,13 @@ Chunking
 Embedding Generation
       │
       ▼
-FAISS Vector Database
+Pinecone (Store + Metadata)
       │
       ▼
-Retriever
+Metadata Filtering (source = "Website")
       │
       ▼
-Relevant Context
+Retriever — Top Relevant Chunks
       │
       ▼
 Prompt Builder
@@ -214,68 +152,212 @@ Generated Answer
 
 ---
 
-## Complete System Architecture
+### PDF Workflow
 
-```text
-                           User Question
-                                  │
-                                  ▼
-                    ┌────────────────────────┐
-                    │      Source Type       │
-                    └──────────┬─────────────┘
-                               │
-          ┌────────────────────┼────────────────────┐
-          │                    │                    │
-          ▼                    ▼                    ▼
-      Wikipedia            Website               PDF
-          │                    │                    │
-          ▼                    ▼                    ▼
-   Wikipedia Search      Website Loader       PDF Loader
-          │                    │                    │
-          ▼                    ▼                    ▼
-      Article Text        Extracted Text      Extracted Text
-          │                    │                    │
-          └────────────┬───────┴───────┬────────────┘
-                       │               │
-                       ▼
-                    Chunking
-                       │
-                       ▼
-              Embedding Generation
-                       │
-                       ▼
-              FAISS Vector Database
-                       │
-                       ▼
-                   Retriever
-                       │
-                       ▼
-               Relevant Chunks
-                       │
-                       ▼
-                 Prompt Builder
-                       │
-                       ▼
-                    Llama 3.2
-                       │
-                       ▼
-                Generated Answer
+```
+PDF Upload
+      │
+      ▼
+PDF Loader (PyPDF)
+      │
+      ▼
+Extract Text
+      │
+      ▼
+Chunking
+      │
+      ▼
+Embedding Generation
+      │
+      ▼
+Pinecone (Store + Metadata)
+      │
+      ▼
+Metadata Filtering (source = "PDF")
+      │
+      ▼
+Retriever — Top Relevant Chunks
+      │
+      ▼
+Prompt Builder
+      │
+      ▼
+Llama 3.2
+      │
+      ▼
+Generated Answer
 ```
 
 ---
 
-# Project Structure
+### Complete System Architecture
 
-```text
+```
+                          User
+                           │
+                           ▼
+               ┌───────────────────────┐
+               │     Choose Source     │
+               └──────────┬────────────┘
+                          │
+         ┌────────────────┼─────────────────┐
+         │                │                 │
+         ▼                ▼                 ▼
+     Wikipedia         Website            PDF
+         │                │                 │
+         ▼                ▼                 ▼
+  Auto Wikipedia     Website Loader    PDF Loader
+     Search               │                 │
+         │                ▼                 ▼
+         ▼           Extract Text      Extract Text
+   Article Text           │                 │
+         │                └────────┬────────┘
+         └────────────────┘        │
+                                   ▼
+                               Chunking
+                                   │
+                                   ▼
+                         Embedding Generation
+                        (mxbai-embed-large)
+                                   │
+                                   ▼
+                    ┌──────────────────────────┐
+                    │         Pinecone          │
+                    │   Cloud Vector Database   │
+                    │    + Metadata Storage     │
+                    └──────────────┬───────────┘
+                                   │
+                                   ▼
+                         Metadata Filtering
+                         (by source type)
+                                   │
+                                   ▼
+                               Retriever
+                          (Top-k Relevant Chunks)
+                                   │
+                                   ▼
+                            Prompt Builder
+                                   │
+                                   ▼
+                              Llama 3.2
+                                   │
+                                   ▼
+                           Generated Answer
+```
+
+---
+
+## 🗄️ Pinecone Metadata
+
+Every chunk stored in Pinecone includes structured metadata:
+
+```json
+{
+    "text": "chunk content",
+    "source": "Wikipedia | Website | PDF",
+    "document": "article title | URL | filename",
+    "chunk_number": 0
+}
+```
+
+### Why Metadata Matters
+
+- **Source Tracking** — know exactly where each answer came from
+- **Explainable AI** — trace answers back to specific documents
+- **Citations** — reference the original source in responses
+- **Debugging** — inspect which chunks were retrieved
+- **Multi-document Retrieval** — manage multiple knowledge sources in one index
+- **Filtering** — query only the relevant source, improving precision
+
+---
+
+## 🎯 Source-Based Retrieval Filtering
+
+Instead of searching all vectors in the Pinecone index, the retriever applies a metadata filter based on the active source type.
+
+```
+Website selected
+       │
+       ▼
+Pinecone query with filter: { "source": "Website" }
+       │
+       ▼
+Only Website chunks are searched and returned
+```
+
+```
+PDF selected
+       │
+       ▼
+Pinecone query with filter: { "source": "PDF" }
+       │
+       ▼
+Only PDF chunks are searched and returned
+```
+
+```
+Wikipedia selected
+       │
+       ▼
+Pinecone query with filter: { "source": "Wikipedia" }
+       │
+       ▼
+Only Wikipedia chunks are searched and returned
+```
+
+This ensures answers are always grounded in the correct knowledge source.
+
+---
+
+## 📁 Project Structure
+
+```
 L1 RAG/
 │
-├── app.py
+├── app.py                        # Streamlit UI
 ├── README.md
 ├── requirements.txt
+├── .env                          # API keys (not committed)
 ├── .gitignore
 │
 ├── config/
-│   └── config.py
+│   └── config.py                 # Configuration and env loading
+│
+├── Sources/
+│   ├── wikipedia_loader.py       # Auto Wikipedia search & extraction
+│   ├── website_loader.py         # Website content extraction
+│   └── pdf_loader.py             # PDF text extraction
+│
+├── Chunking/
+│   ├── chunk_utils.py            # RecursiveCharacterTextSplitter
+│   └── __init__.py
+│
+├── Embeddings/
+│   ├── embedding_utils.py
+│   └── embedding_test.py
+│
+├── VectorDB/
+│   └── pinecone_store.py         # Pinecone store, retrieve, delete
+│
+├── Retrieval/
+│   └── retriever.py              # Source-filtered retrieval
+│
+├── RAG/
+│   ├── prompt_builder.py         # Prompt engineering
+│   └── rag_pipeline.py           # ask_rag + ask_wikipedia
+│
+├── LLM/
+│   ├── llm_utils.py              # Llama 3.2 via Ollama
+│   ├── prompts.py
+│   └── llama_test.py
+│
+├── Tests/
+│   ├── test_wikipedia_rag.py
+│   ├── test_pinecone_rag.py
+│   ├── test_clear_pinecone.py
+│   ├── test_website_rag.py
+│   ├── test_pdf_rag.py
+│   └── test_embeddings.py
 │
 ├── Data/
 │   ├── sample.txt
@@ -283,116 +365,70 @@ L1 RAG/
 │   └── pdfs/
 │
 ├── Docs/
-│
-├── LLM/
-│   ├── llm_utils.py
-│   ├── prompts.py
-│   └── llama_test.py
-│
-├── Embeddings/
-│   ├── embedding_utils.py
-│   └── embedding_test.py
-│
-├── Chunking/
-│   ├── chunk_utils.py
-│   └── __init__.py
-│
-├── Retrieval/
-│   └── retriever.py
-│
-├── RAG/
-│   ├── prompt_builder.py
-│   └── rag_pipeline.py
-│
-├── Sources/
-│   ├── wikipedia_loader.py
-│   ├── website_loader.py
-│   └── pdf_loader.py
-│
-├── VectorDB/
-│   ├── vector_store.py
-│   ├── pdf_index/
-│   └── website_index/
-│
-├── faiss_index/
-│   ├── index.faiss
-│   └── index.pkl
-│
-├── Tests/
-│
 └── venv/
 ```
 
 ---
 
-# Tech Stack
+## 🛠️ Tech Stack
 
-## Programming Language
-
-* Python 3.14
-
-## Large Language Model
-
-* Llama 3.2 (Ollama)
-
-## Embedding Model
-
-* mxbai-embed-large
-
-## Frameworks & Libraries
-
-* LangChain
-* Streamlit
-* Ollama
-* BeautifulSoup4
-* Requests
-* Wikipedia
-* PyPDF
-
-## Vector Database
-
-* FAISS (Facebook AI Similarity Search)
+| Layer | Technology |
+|---|---|
+| Language | Python 3.14 |
+| UI | Streamlit |
+| LLM | Llama 3.2 (Ollama) |
+| Embedding Model | mxbai-embed-large |
+| Vector Database | Pinecone (Serverless) |
+| RAG Framework | LangChain |
+| Wikipedia | Wikipedia API |
+| Web Scraping | BeautifulSoup4, Requests |
+| PDF Processing | PyPDF |
+| Env Management | python-dotenv |
 
 ---
 
-# Installation
+## ⚙️ Installation
 
-## Clone Repository
+### 1. Clone Repository
 
 ```bash
 git clone <repository-url>
 cd L1-RAG
 ```
 
-## Create Virtual Environment
+### 2. Create Virtual Environment
 
 ```bash
 python -m venv venv
 ```
 
-## Activate Virtual Environment
+### 3. Activate Virtual Environment
 
-### Windows
-
+**Windows**
 ```bash
 venv\Scripts\activate
 ```
 
-### Linux / macOS
-
+**Linux / macOS**
 ```bash
 source venv/bin/activate
 ```
 
-## Install Dependencies
+### 4. Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
----
+### 5. Configure Environment Variables
 
-# Ollama Setup
+Create a `.env` file in the project root:
+
+```env
+PINECONE_API_KEY=your_pinecone_api_key_here
+```
+
+### 6. Ollama Setup
 
 Pull the required models:
 
@@ -401,7 +437,7 @@ ollama pull llama3.2
 ollama pull mxbai-embed-large
 ```
 
-Verify installation:
+Verify:
 
 ```bash
 ollama list
@@ -409,7 +445,7 @@ ollama list
 
 ---
 
-# Run Application
+## 🚀 Run Application
 
 ```bash
 streamlit run app.py
@@ -417,60 +453,85 @@ streamlit run app.py
 
 ---
 
-# Usage
+## 📖 Usage
 
-## Wikipedia
+### Wikipedia
 
-1. Select Wikipedia.
-2. Ask a question directly.
-3. System automatically searches Wikipedia.
-4. Relevant article is processed through the RAG pipeline.
-5. Answer is generated.
+1. Select **Wikipedia** from the sidebar
+2. Ask any question directly in the input box
+3. The system automatically searches Wikipedia, retrieves the best article, indexes it in Pinecone, and generates an answer
 
----
-
-## Website
-
-1. Select Website.
-2. Enter website URL.
-3. Load knowledge.
-4. Ask questions.
+> No manual loading required — the entire pipeline runs on question submission.
 
 ---
 
-## PDF
+### Website
 
-1. Select PDF.
-2. Upload PDF document.
-3. Load knowledge.
-4. Ask questions.
-
----
-
-# Example Questions
-
-## Wikipedia
-
-* What is Artificial Intelligence?
-* What is Ray Ban?
-* Who founded Tesla?
-* Explain Machine Learning.
-
-## Website
-
-* What is FastAPI?
-* What are FastAPI features?
-* Explain Dependency Injection.
-
-## PDF
-
-* What is Retrieval-Augmented Generation?
-* Summarize the paper.
-* What challenges do LLMs face?
+1. Select **Website** from the sidebar
+2. Enter the website URL
+3. Click **⚡ Load Knowledge Base**
+4. Ask questions against the website content
 
 ---
 
-# Author
+### PDF
 
-Ayush Raj Dewangan
+1. Select **PDF** from the sidebar
+2. Upload a PDF document
+3. Click **⚡ Load Knowledge Base**
+4. Ask questions against the document
 
+---
+
+## 💬 Example Questions
+
+### Wikipedia
+```
+What is Artificial Intelligence?
+Who founded Tesla?
+What is Ray Ban?
+Explain Machine Learning.
+What is Quantum Computing?
+```
+
+### Website
+```
+What is FastAPI?
+What are the main features of FastAPI?
+Explain Dependency Injection in FastAPI.
+```
+
+### PDF
+```
+What is Retrieval-Augmented Generation?
+Summarize the paper.
+What challenges do LLMs face?
+What methodology was used in this research?
+```
+
+---
+
+## 🧪 Testing
+
+| Test File | Purpose |
+|---|---|
+| `test_wikipedia_rag.py` | Load Wikipedia article → store in Pinecone → verify |
+| `test_pinecone_rag.py` | Query Pinecone and generate answer |
+| `test_clear_pinecone.py` | Delete all vectors from Pinecone index |
+| `test_website_rag.py` | Load website → store in Pinecone → query |
+| `test_pdf_rag.py` | Load PDF → store in Pinecone → query |
+| `test_embeddings.py` | Verify embedding dimensions and model |
+
+Run any test:
+
+```bash
+py -m Tests.test_wikipedia_rag
+py -m Tests.test_pinecone_rag
+py -m Tests.test_clear_pinecone
+```
+
+---
+
+## 👤 Author
+
+**Ayush Raj Dewangan**
